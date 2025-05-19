@@ -1,0 +1,6 @@
+index=main sourcetype=cim_demo
+| rex field=_raw "Failed password for (invalid user|) (?<username>.*) from (?<src_ip>.*) port (?<src_port>.*) (.*)"
+| eval src=src_ip, dest=host, dest_ip=host, bytes=0, bytes_out=0, dest_port=22, transport="tcp"
+| rex field=_raw "(.*) (?<app>.*)\[(.*)\]:(.*)"
+| eval action=case(searchmatch("Failed password", "blocked", searchmatch("Accepted password"), "allowed")
+| table src, dest, dest_ip, bytes, transport, app, bytes_out, dest_port, src_port, src_ip, action
